@@ -1,3 +1,4 @@
+<!-- TEST -->
 <?php
 require_once __DIR__ . '/_bootstrap.php';
 send_common_headers();
