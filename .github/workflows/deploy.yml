@@ -1,0 +1,38 @@
+name: Deploy to Lightsail
+
+on:
+  push:
+    branches: [ "main" ]   # main に push で自動デプロイ
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 依存が必要ならここでビルド（Composer/Node等）を追加
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+
+      - name: Rsync files to Lightsail
+        run: |
+          rsync -az --delete \
+            --exclude=".git" \
+            --exclude=".github" \
+            --exclude="node_modules" \
+            --exclude="vendor" \
+            --exclude="*.md" \
+            -e "ssh -i ~/.ssh/id_ed25519" \
+            ./ ${{ secrets.USER }}@${{ secrets.HOST }}:${{ secrets.TARGET }}
+
+      - name: Post-deploy (permissions / apache reload)
+        run: |
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.USER }}@${{ secrets.HOST }} \
+            'sudo chown -R www-data:www-data '"${{ secrets.TARGET }}"' && sudo systemctl reload apache2 || true'
