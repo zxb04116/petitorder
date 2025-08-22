@@ -1,0 +1,18 @@
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# PHP / Composer
+vendor/
+composer.lock
+composer.phar
+
+# Logs / Cache
+storage/
+*.log
+cache/
+tmp/
+.env
+.env.*
+
