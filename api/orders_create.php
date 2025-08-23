@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/_bootstrap.php';
+send_common_headers();
 // POST /api/orders_create.php : 注文確定（在庫なし版）
 // 期待するJSON: { "items":[{"product_id":1,"qty":2}, ...], "pickup_slot":"12:30" }
 header('Content-Type: application/json; charset=utf-8');
@@ -11,8 +13,6 @@ $data = json_decode($raw, true);
 if (!$data || !isset($data['items']) || !is_array($data['items'])) {
   http_response_code(400); echo json_encode(['ok'=>false,'error'=>'Invalid payload']); exit;
 }
-
-$pdo = new PDO('mysql:host=localhost;dbname=cake_shop;charset=utf8mb4','dbuser','dbpass',[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
 $orderDate = date('Y-m-d');
 $pickup = isset($data['pickup_slot']) ? $data['pickup_slot'] : null;
 

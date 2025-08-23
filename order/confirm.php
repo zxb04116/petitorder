@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/_bootstrap.php';
+send_common_headers();
 csrf_check();
 
 $qty = $_POST['qty'] ?? [];

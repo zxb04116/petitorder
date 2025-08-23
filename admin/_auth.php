@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/_bootstrap.php';
+send_common_headers();
 
 function require_login(array $roles = []): void {
   if (empty($_SESSION['admin'])) {

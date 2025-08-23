@@ -21,13 +21,12 @@ function _status_log($msg){
   @error_log('status_api: ' . $line);
 }
 
-require_once __DIR__ . '/../staff/_auth.php';
-require_once __DIR__ . '/../staff/_bootstrap.php';
+require_once __DIR__ . '/_bootstrap.php';
 _status_log('START method=' . ($_SERVER['REQUEST_METHOD'] ?? ''));
 // guard for includes above
 
 // 共通ヘッダ & 認証
-if (function_exists('send_common_headers')) { send_common_headers(); }
+send_common_headers();
 staff_require_login();
 
 // POST以外は一覧へ（白画面防止）
