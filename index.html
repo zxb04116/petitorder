@@ -181,7 +181,63 @@
     @media (max-width: 600px) {
       section.features { grid-template-columns: 1fr; }
     }
-  </style>
+</style>
+<style>
+  :root{
+    --pf-primary: #2e7d32;          /* 深めのグリーン */
+    --pf-primary-contrast:#ffffff;  /* 文字色(白) */
+    --pf-accent: #81c784;           /* 明るいグリーン */
+    --pf-bg: #f6fbf7;               /* ごく薄いグリーン背景 */
+    --pf-border:#d4e8d8;            /* 枠線の淡いグリーン */
+    --pf-text:#1f2a1f;              /* ベース文字色 */
+    --pf-muted:#5a6b5a;             /* 補助文字色 */
+  }
+  /* 全体 */
+  body { background-color: var(--pf-bg) !important; color: var(--pf-text) !important; }
+  
+  /* ヘッダー */
+  header { background-color: var(--pf-primary) !important; color: var(--pf-primary-contrast) !important; box-shadow: 0 2px 6px rgba(0,0,0,.06); }
+  
+  /* Hero */
+  section.hero { background: #ffffff !important; border: 1px solid var(--pf-border); box-shadow: 0 4px 12px rgba(46,125,50,.10) !important; }
+  section.hero h1 { color: var(--pf-primary) !important; }
+  section.hero p { color: var(--pf-muted) !important; }
+  
+  /* プライマリボタン */
+  .btn-primary { background-color: var(--pf-primary) !important; color: var(--pf-primary-contrast) !important; }
+  .btn-primary:hover { background-color: #27692a !important; }
+  
+  /* 特徴カード */
+  section.features article { background: #ffffff !important; border: 1px solid var(--pf-border); box-shadow: 0 2px 10px rgba(46,125,50,.08) !important; }
+  section.features article h3 { color: var(--pf-primary) !important; }
+  section.features article p { color: var(--pf-muted) !important; }
+  
+  /* ステップ */
+  section.steps { background: #ffffff !important; border: 1px solid var(--pf-border); box-shadow: 0 4px 12px rgba(46,125,50,.10) !important; }
+  section.steps h2 { color: var(--pf-primary) !important; }
+  .step { background: #ffffff !important; border: 1px solid var(--pf-border); box-shadow: 0 2px 8px rgba(46,125,50,.06) !important; }
+  .step h4 { color: var(--pf-primary) !important; }
+  .step p { color: var(--pf-text) !important; }
+  
+  /* 注文フォーム(デモ) */
+  section.order { background: #ffffff !important; border: 1px solid var(--pf-border); box-shadow: 0 4px 12px rgba(46,125,50,.12) !important; }
+  section.order h2 { color: var(--pf-primary) !important; }
+  .order-note { color: var(--pf-muted) !important; }
+  
+  /* フォーム部品 */
+  label { color: var(--pf-muted) !important; }
+  input[type="text"], input[type="email"], select, textarea { border: 1px solid var(--pf-border) !important; }
+  input[type="text"]:focus, input[type="email"]:focus, select:focus, textarea:focus {
+    outline: none; border-color: var(--pf-accent) !important; box-shadow: 0 0 0 3px rgba(129,199,132,.25);
+  }
+  
+  /* 送信ボタン */
+  .submit-button { background-color: var(--pf-primary) !important; color: var(--pf-primary-contrast) !important; }
+  .submit-button:hover { background-color: #27692a !important; }
+  
+  /* フッター */
+  footer { color: var(--pf-muted) !important; }
+</style>
 </head>
 <body>
   <header>
