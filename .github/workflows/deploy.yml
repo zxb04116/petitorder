@@ -49,41 +49,6 @@ jobs:
             ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
           fi
 
-      - name: Prepare shared uploads on server
-        env:
-          HOST:   ${{ secrets.HOST }}
-          USER:   ${{ secrets.USER }}
-          TARGET: ${{ secrets.TARGET }}
-          PORT:   ${{ secrets.PORT }}
-        run: |
-          set -eu
-          SSH_OPTS="-i ~/.ssh/id_ed25519"
-          [ -n "${PORT:-}" ] && SSH_OPTS="$SSH_OPTS -p $PORT"
-          ssh $SSH_OPTS "$USER@$HOST" bash -lc "
-            set -eu
-            SHARED_BASE=/var/www/shared
-            SHARED_DIR=\$SHARED_BASE/uploads/products
-            TARGET_DIR=\"$TARGET/public/uploads/products\"
-
-            # 1) 共有ディレクトリを用意
-            sudo mkdir -p \"\$SHARED_DIR\"
-            sudo chown -R www-data:www-data \"\$SHARED_BASE\"
-            sudo find \"\$SHARED_DIR\" -type d -exec chmod 755 {} \;
-            sudo find \"\$SHARED_DIR\" -type f -exec chmod 644 {} \;
-
-            # 2) 既存のuploadsが通常ディレクトリなら中身を移動
-            if [ -d \"\$TARGET_DIR\" ] && [ ! -L \"\$TARGET_DIR\" ]; then
-              echo \"Migrating existing uploads to shared directory...\"
-              sudo rsync -a \"\$TARGET_DIR/\" \"\$SHARED_DIR/\"
-              sudo rm -rf \"\$TARGET_DIR\"
-            fi
-
-            # 3) シンボリックリンクを張る（無ければ）
-            if [ ! -L \"\$TARGET_DIR\" ]; then
-              sudo ln -s \"\$SHARED_DIR\" \"\$TARGET_DIR\"
-            fi
-          "
-
       - name: Rsync files to Lightsail
         env:
           HOST:   ${{ secrets.HOST }}
@@ -109,10 +74,10 @@ jobs:
           TARGET: ${{ secrets.TARGET }}
           PORT:   ${{ secrets.PORT }}
           SHA:    ${{ github.sha }}
+          SUDO_PASSWORD: ${{ secrets.SUDO_PASSWORD }}
         run: |
           set -eu
           SSH_OPTS="-i ~/.ssh/id_ed25519"
           [ -n "${PORT:-}" ] && SSH_OPTS="$SSH_OPTS -p $PORT"
           ssh $SSH_OPTS "$USER@$HOST" \
-            "echo 'deployed $SHA at $(date -u +%F_%T) UTC' | sudo tee '$TARGET/.last_deploy' >/dev/null && \
-             sudo chown -R www-data:www-data '$TARGET' && sudo systemctl reload apache2 || true"
+            "echo 'deployed $SHA at \$(date -u +%F_%T) UTC' | ( [ -n \"\$SUDO_PASSWORD\" ] && echo \"\$SUDO_PASSWORD\" | sudo -S tee '\$TARGET/.last_deploy' >/dev/null || tee '\$TARGET/.last_deploy' >/dev/null ) && ( [ -n \"\$SUDO_PASSWORD\" ] && echo \"\$SUDO_PASSWORD\" | sudo -S systemctl reload apache2 || sudo systemctl reload apache2 ) || true"
