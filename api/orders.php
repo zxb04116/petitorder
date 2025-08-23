@@ -78,8 +78,9 @@ try {
   // どちらも空になってしまった場合のフォールバック
   if ($tab === 'done') {
     if (empty($doneStatuses)) $doneStatuses = ['picked_up','delivered','canceled'];
-    $in = implode(',', array_map(fn($s) => $pdo->quote($s), $doneStatuses));
-    $where = "status IN ($in)";
+    $placeholders = implode(',', array_fill(0, count($doneStatuses), '?'));
+    $where = "status IN ($placeholders)";
+    $statuses = $doneStatuses;
     // 当日のみ表示（完了タブ）。基準日は updated_at があればそれ、なければ created_at / order_date
     try {
       $colsStmt2 = $pdo->query("SHOW COLUMNS FROM orders");
@@ -94,8 +95,9 @@ try {
     } catch (Throwable $e) { /* フィルタ付与失敗時は全件返す */ }
   } else {
     if (empty($listStatuses)) $listStatuses = ['confirmed','pending','preparing','ready'];
-    $in = implode(',', array_map(fn($s) => $pdo->quote($s), $listStatuses));
-    $where = "status IN ($in)";
+    $placeholders = implode(',', array_fill(0, count($listStatuses), '?'));
+    $where = "status IN ($placeholders)";
+    $statuses = $listStatuses;
   }
 
   // 並び順（受付時刻優先、昇順または降順）
@@ -107,7 +109,8 @@ try {
 
   // 実行
   $sql = "SELECT {$select} FROM orders WHERE {$where} ORDER BY {$orderBy} LIMIT 200";
-  $stmt = $pdo->query($sql);
+  $stmt = $pdo->prepare($sql);
+  $stmt->execute($statuses);
   $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
   // 補完と整形
