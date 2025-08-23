@@ -4,6 +4,16 @@ ini_set('session.use_strict_mode', '1');
 session_name('cake_admin');
 session_start();
 
+// 共通セキュリティヘッダ
+function send_common_headers(): void {
+  if (!headers_sent()) {
+    header('X-Frame-Options: SAMEORIGIN');
+    header('X-Content-Type-Options: nosniff');
+    header('Referrer-Policy: no-referrer-when-downgrade');
+    header("Content-Security-Policy: default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'");
+  }
+}
+
 $pdo = new PDO(
   'mysql:host=localhost;dbname=cake_shop;charset=utf8mb4', // ←DB名
   'cake_user',                                                // ←ユーザー

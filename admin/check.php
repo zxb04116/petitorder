@@ -1,7 +1,8 @@
 <?php
 // /var/www/html/admin/check_password.php （作成後にブラウザで開く）
 // 終わったら必ず削除！
-$pdo = new PDO('mysql:host=localhost;dbname=cake_shop;charset=utf8mb4','cake_user','wor]eaSy',[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
+require_once __DIR__ . '/_bootstrap.php';
+send_common_headers();
 $st = $pdo->prepare("SELECT password_hash FROM admin_users WHERE username='admin'");
 $st->execute();
 $hash = $st->fetchColumn();

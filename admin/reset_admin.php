@@ -1,6 +1,7 @@
 <?php
 // 実行後は必ずファイル削除してください
-$pdo = new PDO('mysql:host=localhost;dbname=cake_shop;charset=utf8mb4','cake_user','wor]eaSy',[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
+require_once __DIR__ . '/_bootstrap.php';
+send_common_headers();
 
 $hash = password_hash('Admin@1234', PASSWORD_DEFAULT); // ここで同一環境で新規生成
 $st = $pdo->prepare("UPDATE admin_users

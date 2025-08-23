@@ -10,6 +10,7 @@ declare(strict_types=1);
  */
 
 require_once __DIR__ . '/_bootstrap.php'; // セッション/CSRF/$pdo/共通ヘッダ
+send_common_headers();
 
 // 開発中のみ（本番は 0 に戻す）
 ini_set('display_errors', '1');
