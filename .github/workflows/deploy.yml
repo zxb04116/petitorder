@@ -24,7 +24,7 @@ jobs:
           HOST:   ${{ secrets.HOST }}
           USER:   ${{ secrets.USER }}
           TARGET: ${{ secrets.TARGET }}
-          SSH_KEY:${{ secrets.SSH_KEY }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
         run: |
           set -eu
           [ -n "$HOST" ]   || { echo "::error::HOST secret is empty"; exit 1; }
