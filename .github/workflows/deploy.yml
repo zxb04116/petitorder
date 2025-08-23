@@ -12,8 +12,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: PETITORDER   # ← Environments の名前と完全一致させる（大文字小文字も）
-
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
