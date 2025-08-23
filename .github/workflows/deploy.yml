@@ -12,7 +12,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: petitorder   # ← Environments の名前と完全一致させる（大文字小文字も）
+    environment: PETITORDER   # ← Environments の名前と完全一致させる（大文字小文字も）
 
     steps:
       - name: Checkout
