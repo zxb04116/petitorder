@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../env.php';
 mb_internal_encoding('UTF-8');
 ini_set('session.use_strict_mode', '1');
 session_name('cake_staff');

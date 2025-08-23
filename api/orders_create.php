@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../env.php';
 // POST /api/orders_create.php : 注文確定（在庫なし版）
 // 期待するJSON: { "items":[{"product_id":1,"qty":2}, ...], "pickup_slot":"12:30" }
 header('Content-Type: application/json; charset=utf-8');
@@ -11,8 +12,17 @@ $data = json_decode($raw, true);
 if (!$data || !isset($data['items']) || !is_array($data['items'])) {
   http_response_code(400); echo json_encode(['ok'=>false,'error'=>'Invalid payload']); exit;
 }
+$dbHost = getenv('DB_HOST') ?: 'localhost';
+$dbName = getenv('DB_NAME') ?: 'cake_shop';
+$dbUser = getenv('DB_USER') ?: 'cake_user';
+$dbPass = getenv('DB_PASS') ?: 'wor]eaSy';
 
-$pdo = new PDO('mysql:host=localhost;dbname=cake_shop;charset=utf8mb4','dbuser','dbpass',[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
+$pdo = new PDO(
+    sprintf('mysql:host=%s;dbname=%s;charset=utf8mb4', $dbHost, $dbName),
+    $dbUser,
+    $dbPass,
+    [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+);
 $orderDate = date('Y-m-d');
 $pickup = isset($data['pickup_slot']) ? $data['pickup_slot'] : null;
 
