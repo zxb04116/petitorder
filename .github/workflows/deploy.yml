@@ -38,7 +38,7 @@ jobs:
         env:
           HOST:   ${{ secrets.HOST }}
           PORT:   ${{ secrets.PORT }}     # 22なら不要
-          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_KEY: ${{ secrets.SSH_KEY }} #空白が抜けていた
         run: |
           set -eu
           mkdir -p ~/.ssh
