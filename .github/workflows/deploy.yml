@@ -2,38 +2,82 @@ name: Deploy to Lightsail
 
 on:
   push:
-    branches: [ "main" ]   # main に push で自動デプロイ
+    branches: [ "main" ]
+  workflow_dispatch: {}   # ← 手動実行も可に（検証が楽）
+
+concurrency:
+  group: petitorder-prod
+  cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: petitorder
+    environment: petitorder   # ← Environments の名前と完全一致させる（大文字小文字も）
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 依存が必要ならここでビルド（Composer/Node等）を追加
-
-      - name: Setup SSH
+      # ❶ Secrets が空ならその場で停止（値は表示しない）
+      - name: Preflight (check secrets)
+        env:
+          HOST:   ${{ secrets.HOST }}
+          USER:   ${{ secrets.USER }}
+          TARGET: ${{ secrets.TARGET }}
+          SSH_KEY:${{ secrets.SSH_KEY }}
         run: |
+          set -eu
+          [ -n "$HOST" ]   || { echo "::error::HOST secret is empty"; exit 1; }
+          [ -n "$USER" ]   || { echo "::error::USER secret is empty"; exit 1; }
+          [ -n "$TARGET" ] || { echo "::error::TARGET secret is empty"; exit 1; }
+          [ -n "$SSH_KEY" ]|| { echo "::error::SSH_KEY secret is empty"; exit 1; }
+          echo "Secrets OK"
+
+      # ❷ 鍵配置と known_hosts 登録（HOST が空でも落ちるようガード済）
+      - name: Setup SSH
+        env:
+          HOST:   ${{ secrets.HOST }}
+          PORT:   ${{ secrets.PORT }}     # 22なら不要
+          SSH_KEY:${{ secrets.SSH_KEY }}
+        run: |
+          set -eu
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
+          printf '%s' "$SSH_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+          if [ -n "${PORT:-}" ]; then
+            ssh-keyscan -p "$PORT" -H "$HOST" >> ~/.ssh/known_hosts
+          else
+            ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
+          fi
 
       - name: Rsync files to Lightsail
+        env:
+          HOST:   ${{ secrets.HOST }}
+          USER:   ${{ secrets.USER }}
+          TARGET: ${{ secrets.TARGET }}
+          PORT:   ${{ secrets.PORT }}
         run: |
-          rsync -az --delete \
-            --exclude=".git" \
-            --exclude=".github" \
-            --exclude="node_modules" \
-            --exclude="vendor" \
-            --exclude="*.md" \
-            -e "ssh -i ~/.ssh/id_ed25519" \
-            ./ ${{ secrets.USER }}@${{ secrets.HOST }}:${{ secrets.TARGET }}
+          set -eu
+          SSH_OPTS="-i ~/.ssh/id_ed25519"
+          [ -n "${PORT:-}" ] && SSH_OPTS="$SSH_OPTS -p $PORT"
+          rsync -azv --itemize-changes --delete \
+            --exclude=".git" --exclude=".github" \
+            --exclude="node_modules" --exclude="vendor" \
+            --exclude="*.md" --exclude=".env*" --exclude=".DS_Store" \
+            -e "ssh $SSH_OPTS" \
+            ./ "$USER@$HOST:$TARGET"
 
-      - name: Post-deploy (permissions / apache reload)
+      - name: Post-deploy (mark & reload)
+        env:
+          HOST:   ${{ secrets.HOST }}
+          USER:   ${{ secrets.USER }}
+          TARGET: ${{ secrets.TARGET }}
+          PORT:   ${{ secrets.PORT }}
+          SHA:    ${{ github.sha }}
         run: |
-          ssh -i ~/.ssh/id_ed25519 ${{ secrets.USER }}@${{ secrets.HOST }} \
-            'sudo chown -R www-data:www-data '"${{ secrets.TARGET }}"' && sudo systemctl reload apache2 || true'
+          set -eu
+          SSH_OPTS="-i ~/.ssh/id_ed25519"
+          [ -n "${PORT:-}" ] && SSH_OPTS="$SSH_OPTS -p $PORT"
+          ssh $SSH_OPTS "$USER@$HOST" \
+            "echo 'deployed $SHA at $(date -u +%F_%T) UTC' | sudo tee '$TARGET/.last_deploy' >/dev/null && \
+             sudo chown -R www-data:www-data '$TARGET' && sudo systemctl reload apache2 || true"
