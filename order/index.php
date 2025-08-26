@@ -1,4 +1,3 @@
-<!-- TEST 4 -->
 <?php
 require_once __DIR__ . '/_bootstrap.php';
 send_common_headers();
@@ -11,56 +10,6 @@ $rows = $pdo->query("SELECT id,name,price_yen,image_path FROM products WHERE sta
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="stylesheet" href="/order/assets/styles.css">
-<style>
-  :root{
-    /* プチフール(order)風のグリーン系テーマ */
-    --pf-primary: #2e7d32;           /* 深めのグリーン */
-    --pf-primary-contrast:#ffffff;   /* 文字色(白) */
-    --pf-accent: #81c784;            /* 明るいグリーン */
-    --pf-bg: #f6fbf7;                /* ごく薄いグリーン背景 */
-    --pf-border:#d4e8d8;             /* 枠線の淡いグリーン */
-    --pf-text:#1f2a1f;               /* 濃いめのテキスト色 */
-    --pf-muted:#5a6b5a;              /* 補助テキスト */
-  }
-
-  /* 全体背景と文字色 */
-  html,body{ background: var(--pf-bg); color: var(--pf-text); }
-
-  /* ヘッダー */
-  .header{ background: var(--pf-primary); color: var(--pf-primary-contrast); box-shadow: 0 2px 6px rgba(0,0,0,.08); }
-  .header .brand{ font-weight: 700; }
-
-  /* カード */
-  .card{ border: 1px solid var(--pf-border); border-radius: 12px; overflow: hidden; background:#fff; box-shadow: 0 2px 10px rgba(46,125,50,.06); }
-  .card img{ display:block; width:100%; height:auto; }
-  .card h3{ margin: 8px 0; line-height:1.3; }
-  .price{ color: var(--pf-primary); font-weight: 700; }
-
-  /* 数量UI */
-  .qty label{ color: var(--pf-muted); font-size: .9rem; }
-  .qty-input{ border:1px solid var(--pf-border); border-radius: 8px; padding:10px 12px; }
-  .qty-input:focus{ outline: none; border-color: var(--pf-accent); box-shadow: 0 0 0 3px rgba(129,199,132,.25); }
-
-  /* ボタン（共通） */
-  .button, .btn{ border: none; border-radius: 10px; cursor: pointer; }
-  .button{ background: var(--pf-primary); color: var(--pf-primary-contrast); }
-  .button:hover{ filter: brightness(1.05); }
-  .button:active{ transform: translateY(1px); }
-
-  /* マイナス側（セカンダリ） */
-  .btn-secondary{ background: #ffffff; color: var(--pf-primary); border:1px solid var(--pf-border); }
-  .btn-secondary:hover{ background:#f0f7f1; }
-
-  /* 画面下のアクションバー */
-  .action-bar{ background:#ffffff; border-top:1px solid var(--pf-border); box-shadow: 0 -4px 12px rgba(46,125,50,.06); }
-  .action-bar .summary{ color: var(--pf-muted); }
-
-  /* レスポンシブの余白感を少し広めに */
-  .container{ padding-left: 16px; padding-right: 16px; }
-
-  /* フォーカス可視性の改善 */
-  :is(button,.button,.btn,.qty-input):focus-visible{ outline: 3px solid rgba(129,199,132,.6); outline-offset: 2px; }
-</style>
 <title>プチフール｜商品のご注文</title>
 
 <header class="header">
